@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { MdEditSquare } from "react-icons/md";
 import { IoCloudDone } from "react-icons/io5";
 import CustomDropdown from "./CustomDropdown";
 import Cropper from "react-easy-crop";
 import { AiFillCloseCircle } from "react-icons/ai";
+import axios from "axios";
 
 const UpdateProduct = ({ products }) => {
   const [editedProducts, setEditedProducts] = useState([...products]);
@@ -25,7 +26,7 @@ const UpdateProduct = ({ products }) => {
     weight: "",
     length: "",
     width: "",
-    ringSize: "",
+    ring_size: "",
     color: "",
     stone: "",
     gender: "",
@@ -34,6 +35,29 @@ const UpdateProduct = ({ products }) => {
     images: [null, null, null, null],
   });
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/product/all');
+        //console.log(response.data);
+        const productsWithImages = response.data.map(product => {
+            // console.log(product.images.length);
+            for (let i = 0; i < product.images.length; i++) {
+              // console.log('run time',i);
+              // console.log(product.images[i].url);
+              if (product.images[i]) {
+                product.images[i] = `http://localhost:3000${product.images[i].url}`;
+              }
+            }
+        });
+        setEditedProducts(response.data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+  
+    fetchProducts();
+  }, []);
   const handleEdit = (index, field, value) => {
     const updatedProducts = [...editedProducts];
     updatedProducts[index] = { ...updatedProducts[index], [field]: value };
@@ -60,32 +84,42 @@ const UpdateProduct = ({ products }) => {
     setEditFormData({ ...editFormData, images: newImages });
   };
 
-  const handleSave = () => {
-    const updatedProducts = [...editedProducts];
-    updatedProducts[editIndex] = editFormData;
-    setEditedProducts(updatedProducts);
-    setShowPopup(true);
-    setTimeout(() => setShowPopup(false), 2000);
-    setEditIndex(null);
-    setEditFormData({
-      title: "",
-      category: "",
-      price: "",
-      description: "",
-      stock: "",
-      metal: "",
-      weight: "",
-      length: "",
-      width: "",
-      ringSize: "",
-      color: "",
-      stone: "",
-      gender: "",
-      review: "",
-      style: "",
-      images: [null, null, null, null],
-    });
+  const handleSave = async () => {
+    try {
+      const updatedProduct = { ...editFormData };
+      console.log(updatedProduct)
+      await axios.put(`http://localhost:3000/api/product/update/${editFormData.id}`, updatedProduct);
+      
+      const updatedProducts = [...editedProducts];
+      updatedProducts[editIndex] = editFormData;
+      setEditedProducts(updatedProducts);
+      setShowPopup(true);
+      setTimeout(() => setShowPopup(false), 2000);
+      setEditIndex(null);
+      
+      setEditFormData({
+        title: "",
+        category: "",
+        price: "",
+        description: "",
+        stock: "",
+        metal: "",
+        weight: "",
+        length: "",
+        width: "",
+        ringSize: "",
+        color: "",
+        stone: "",
+        gender: "",
+        review: "",
+        style: "",
+        images: [null, null, null, null],
+      });
+    } catch (error) {
+      console.error('Error updating product:', error);
+    }
   };
+  
 
   const handleEditClick = (index) => {
     setEditIndex(index);
@@ -273,10 +307,10 @@ const UpdateProduct = ({ products }) => {
               </label>
               <input
                 type="text"
-                id="discount"
+                id="review"
                 value={editFormData.review}
                 onChange={(e) =>
-                  handleEdit(editIndex, "review", e.target.value)
+                  handleEdit(editIndex, "review", e.target.value.replace(/[^0-9]/g, ""))
                 }
                 className="p-3 text-black border-none rounded-lg bg-gray-200 w-full"
                 placeholder="Reviews"
@@ -316,7 +350,7 @@ const UpdateProduct = ({ products }) => {
                 <CustomDropdown
                   label="Color"
                   options={[
-                    { label: "Red", value: "red" },
+                    { label: "gold", value: "gold" },
                     { label: "Green", value: "green" },
                     { label: "Blue", value: "blue" },
                   ]}
@@ -329,6 +363,7 @@ const UpdateProduct = ({ products }) => {
                 <CustomDropdown
                   label="Category"
                   options={[
+                    { label: "rings", value: "rings" },
                     { label: "Tops", value: "tops" },
                     { label: "Bottoms", value: "bottoms" },
                     { label: "Dresses", value: "dresses" },
@@ -353,7 +388,7 @@ const UpdateProduct = ({ products }) => {
                   name="weight"
                   value={editFormData.weight}
                   onChange={(e) =>
-                    handleEdit(editIndex, "category", e.target.value)
+                    handleEdit(editIndex, "weight", e.target.value)
                   }
                 />
                 <CustomDropdown
@@ -368,7 +403,7 @@ const UpdateProduct = ({ products }) => {
                   name="length"
                   value={editFormData.length}
                   onChange={(e) =>
-                    handleEdit(editIndex, "category", e.target.value)
+                    handleEdit(editIndex, "length", e.target.value)
                   }
                 />
                 <CustomDropdown
@@ -383,7 +418,7 @@ const UpdateProduct = ({ products }) => {
                   name="width"
                   value={editFormData.width}
                   onChange={(e) =>
-                    handleEdit(editIndex, "category", e.target.value)
+                    handleEdit(editIndex, "width", e.target.value)
                   }
                 />
                 <CustomDropdown
@@ -395,16 +430,16 @@ const UpdateProduct = ({ products }) => {
                     { label: "8", value: "8" },
                     { label: "9", value: "9" },
                   ]}
-                  name="ringSize"
-                  value={editFormData.ringSize}
+                  name="ring_size"
+                  value={editFormData.ring_size}
                   onChange={(e) =>
-                    handleEdit(editIndex, "category", e.target.value)
+                    handleEdit(editIndex, "ring_size", e.target.value)
                   }
                 />
                 <CustomDropdown
                   label="Stone"
                   options={[
-                    { label: "Diamond", value: "diamond" },
+                    { label: "natural-diamonds", value: "natural-diamonds" },
                     { label: "Ruby", value: "ruby" },
                     { label: "Sapphire", value: "sapphire" },
                     { label: "Emerald", value: "emerald" },
@@ -434,8 +469,8 @@ const UpdateProduct = ({ products }) => {
                 <CustomDropdown
                   label="Gender"
                   options={[
-                    { label: "Male", value: "M" },
-                    { label: "Female", value: "F" },
+                    { label: "Male", value: "men" },
+                    { label: "Female", value: "women" },
                   ]}
                   name="gender"
                   value={editFormData.gender}
@@ -446,7 +481,7 @@ const UpdateProduct = ({ products }) => {
                 <CustomDropdown
                   label="Style"
                   options={[
-                    { label: "Modern", value: "modern" },
+                    { label: "Cuban", value: "Cuban" },
                     { label: "Vintage", value: "vintage" },
                     { label: "Classic", value: "classic" },
                     { label: "Retro", value: "retro" },

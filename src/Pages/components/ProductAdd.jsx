@@ -14,7 +14,7 @@ const ProductAdd = ({ onSubmit }) => {
     weight: "",
     length: "",
     width: "",
-    ringSize: "",
+    ring_size: "",
     color: "",
     stone: "",
     gender: "",
@@ -55,27 +55,54 @@ const ProductAdd = ({ onSubmit }) => {
     setProduct({ ...product, images: updatedImages });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(product);
-    setProduct({
-      title: "",
-      category: "",
-      price: "",
-      description: "",
-      stock: "",
-      metal: "",
-      weight: "",
-      length: "",
-      width: "",
-      ringSize: "",
-      color: "",
-      stone: "",
-      gender: "",
-      review: "",
-      style: "",
-      images: [null, null, null, null],
+    
+    const formData = new FormData();
+    Object.keys(product).forEach(key => {
+      if (key !== 'images') {
+        formData.append(key, product[key]);
+      }
     });
+    for (let i = 0; i < product.images.length; i++) {
+      if (product.images[i]) {
+        const response = await fetch(product.images[i]);
+        const blob = await response.blob();
+        formData.append('images', blob, `image-${i}.jpeg`);
+      }
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/api/product/add', {
+        method: 'POST',
+        body: formData,
+      });
+      if (response.ok) {
+        console.log('Product added successfully');
+        setProduct({
+          title: "",
+          category: "",
+          price: "",
+          description: "",
+          stock: "",
+          metal: "",
+          weight: "",
+          length: "",
+          width: "",
+          ring_size: "",
+          color: "",
+          stone: "",
+          gender: "",
+          review: "",
+          style: "",
+          images: [null, null, null, null],
+        });
+      } else {
+        console.error('Failed to add product');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
@@ -206,6 +233,7 @@ const ProductAdd = ({ onSubmit }) => {
           <CustomDropdown
             label="Category"
             options={[
+              { label: "rings", value: "rings"},
               { label: "Tops", value: "tops" },
               { label: "Bottoms", value: "bottoms" },
               { label: "Dresses", value: "dresses" },
@@ -263,14 +291,14 @@ const ProductAdd = ({ onSubmit }) => {
               { label: "8", value: "8" },
               { label: "9", value: "9" },
             ]}
-            name="ringSize"
-            value={product.ringSize}
+            name="ring_size"
+            value={product.ring_size}
             onChange={handleChange}
           />
           <CustomDropdown
             label="Stone"
             options={[
-              { label: "Diamond", value: "diamond" },
+              { label: "natural-diamonds", value: "natural-diamonds" },
               { label: "Ruby", value: "ruby" },
               { label: "Sapphire", value: "sapphire" },
               { label: "Emerald", value: "emerald" },
@@ -297,7 +325,7 @@ const ProductAdd = ({ onSubmit }) => {
           <CustomDropdown
             label="Style"
             options={[
-              { label: "Modern", value: "modern" },
+              { label: "Cuban", value: "Cuban" },
               { label: "Vintage", value: "vintage" },
               { label: "Classic", value: "classic" },
               { label: "Retro", value: "retro" },
@@ -310,8 +338,8 @@ const ProductAdd = ({ onSubmit }) => {
           <CustomDropdown
             label="Gender"
             options={[
-              { label: "Male", value: "M" },
-              { label: "Female", value: "F" },
+              { label: "Male", value: "men" },
+              { label: "Female", value: "women" },
             ]}
             name="gender"
             value={product.gender}
@@ -333,7 +361,7 @@ const ProductAdd = ({ onSubmit }) => {
           <CustomDropdown
             label="Color"
             options={[
-              { label: "Red", value: "red" },
+              { label: "gold", value: "gold" },
               { label: "Green", value: "green" },
               { label: "Blue", value: "blue" },
             ]}
