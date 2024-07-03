@@ -1,58 +1,46 @@
-import React, { useState } from "react";
-import sampleData from "../data/sampleData.json";
-import ReUsableItemStock from "./components/Stock/ReUsableItemStock";
+import React, { useState, useEffect } from "react";
+import Orders from "./components/Stock/order";
+import OutOfStock from "./components/Stock/outofstock";
+import Sold from "./components/Stock/Sold";
 import { FaSearch } from "react-icons/fa";
 
 function Order() {
   const [currentView, setCurrentView] = useState("orders");
   const [searchInput, setSearchInput] = useState("");
+  const [itemsStock, setItemsStock] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const { ItemsStock } = sampleData;
 
-  const filteredItems = ItemsStock.filter((item) =>
-    item.name.toLowerCase().includes(searchInput.toLowerCase())
-  );
-
-  const itemsWithUnsold = filteredItems.filter(
-    (item) => item.status === "unsold"
-  );
-  const itemsWithSold = filteredItems.filter((item) => item.status === "sold");
-  const itemsOutofStock = filteredItems.filter((item) => item.OutofStock === 0);
-  const itemsWithOrders = filteredItems.filter(
-    (item) => item.orders > 0 && item.orderShow === true
+  const filteredItems = itemsStock.filter((item) =>
+    item.product && item.product.name && item.product.name.toLowerCase().includes(searchInput.toLowerCase())
   );
 
   const renderContent = () => {
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>{error}</p>;
+
     switch (currentView) {
       case "orders":
         return (
           <div>
-            <ReUsableItemStock
-              items={itemsWithOrders}
+            <Orders
               pageIdentifier="orders"
-            />
-          </div>
-        );
-      case "unsold":
-        return (
-          <div>
-            <ReUsableItemStock
-              items={itemsWithUnsold}
-              pageIdentifier="unsold"
             />
           </div>
         );
       case "sold":
         return (
           <div>
-            <ReUsableItemStock items={itemsWithSold} pageIdentifier="sold" />
+            <Sold
+              pageIdentifier="sold"
+            />
           </div>
         );
       case "outofstock":
         return (
           <div>
-            <ReUsableItemStock
-              items={itemsOutofStock}
+            <OutOfStock
               pageIdentifier="Outof Stock"
             />
           </div>
@@ -80,9 +68,6 @@ function Order() {
         <div className="flex gap-3">
           <button onClick={() => setCurrentView("orders")}>
             <h2 className="font-bold">Orders</h2>
-          </button>
-          <button onClick={() => setCurrentView("unsold")}>
-            <h2 className="font-bold">Unsold Items</h2>
           </button>
           <button onClick={() => setCurrentView("sold")}>
             <h2 className="font-bold">Sold Items</h2>
