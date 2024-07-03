@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import ItemDetails from "./ItemDetails";
 import axios from "axios";
+import { FaSearch } from "react-icons/fa";
 
 const Sold = () => {
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,11 +35,26 @@ const Sold = () => {
     }
   };
 
+  // Filtering items based on search input
+  const filteredItems = items.filter((item) =>
+    item.product.title.toLowerCase().includes(searchInput.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="relative flex items-center w-full my-5">
+        <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        <input
+          type="text"
+          placeholder="Search or type Command ..."
+          className="outline-none border border-gray-300 rounded-full px-10 py-2 text-md w-full"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
+      </div>
       <h1 className="text-2xl font-bold mb-4">{getStatusText("sold")}</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {items.map((item) => (
+        {filteredItems.map((item) => (
           <div
             key={item.id}
             className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer"

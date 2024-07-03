@@ -53,18 +53,6 @@ function Order() {
   return (
     <div>
       <div className="my-4">
-        <div>
-          <div className="relative flex items-center w-full my-5">
-            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search or type Command ..."
-              className="outline-none border border-gray-300 rounded-full px-10 py-2 text-md w-full"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-          </div>
-        </div>
         <div className="flex gap-3">
           <button onClick={() => setCurrentView("orders")}>
             <h2 className="font-bold">Orders</h2>
