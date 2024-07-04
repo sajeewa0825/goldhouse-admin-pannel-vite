@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios'; // Import axios
 import DropDownOption from "../components/Ui/DropDownOption";
 import SideBanner from "../components/SideBanner";
 import LineChart from "../components/Ui/LineChart";
-import sampleData from "../data/sampleData.json";
 
 function Home() {
   const [customersAmount, setCustomersAmount] = useState(0);
@@ -13,38 +13,38 @@ function Home() {
   const [incomeChange, setIncomeChange] = useState(0);
 
   useEffect(() => {
-    const fetchData = () => {
-      const fetchedCustomersAmount = sampleData.ItemsStock[0].customersAmount;
-      const fetchedIncome = sampleData.ItemsStock[0].income;
+    const fetchData = async () => {
+      try {
+        // Fetch total customers
+        const customersResponse = await axios.get('http://localhost:3000/api/user/total-customers');
+        const totalCustomers = customersResponse.data.totalCustomers;
+        setCustomersAmount(totalCustomers);
 
-      const customersChange =
-        prevCustomersAmount !== 0
-          ? ((fetchedCustomersAmount - prevCustomersAmount) /
-              prevCustomersAmount) *
-            100
-          : 0;
-      const incomeChange =
-        prevIncome !== 0
-          ? ((fetchedIncome - prevIncome) / prevIncome) * 100
-          : 0;
+        // Fetch total income
+        const incomeResponse = await axios.get('http://localhost:3000/api/order/total-income');
+        const totalIncome = incomeResponse.data[0].totalIncome; // Adjust according to your data structure
+        setIncome(totalIncome);
 
-      setCustomersAmount(fetchedCustomersAmount);
-      setIncome(fetchedIncome);
+        // Set changes for demonstration purposes (replace with real calculations if needed)
+        setCustomersChange((totalCustomers - prevCustomersAmount) / prevCustomersAmount * 100);
+        setIncomeChange((totalIncome - prevIncome) / prevIncome * 100);
 
-      console.log("Customers Change:", customersChange.toFixed(2) + "%");
-      console.log("Income Change:", incomeChange.toFixed(2) + "%");
+        // Update previous amounts for next comparison
+        setPrevCustomersAmount(totalCustomers);
+        setPrevIncome(totalIncome);
 
-      setCustomersChange(customersChange);
-      setIncomeChange(incomeChange);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
 
     fetchData();
-  }, []);
+  }, [prevCustomersAmount, prevIncome]);
 
   return (
     <div>
       <div className="my-4">
-        <div className="flex gap-3">
+        {/* <div className="flex gap-3">
           <button>
             <h2 className="font-bold">Unread Messages</h2>
           </button>
@@ -57,13 +57,13 @@ function Home() {
           <button>
             <h2 className="font-bold">Advertising</h2>
           </button>
-        </div>
+        </div> */}
       </div>
       <div className="text-black lg:grid grid-cols-1 md:grid-cols-4 gap-3 sm:flex sm:flex-col">
         <div className="col-span-3 pb-5 bg-white rounded-xl">
           <div className="text-black p-5 flex justify-between">
             <h1 className="text-3xl font-bold">Overview</h1>
-            <DropDownOption />
+            {/* <DropDownOption /> */}
           </div>
           <div className="flex gap-3 p-4 m-4 rounded-xl bg-slate-100">
             <div className="w-full">
@@ -71,13 +71,13 @@ function Home() {
                 <h1 className="text-xl font-bold">Customers</h1>
                 <div className="flex justify-between">
                   <div className="text-2xl font-bold">{customersAmount}</div>
-                  <div
+                  {/* <div
                     className={`text-${
                       customersChange >= 0 ? "green" : "red"
                     }-500`}
                   >
                     {customersChange.toFixed(2)} %{" "}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -86,13 +86,13 @@ function Home() {
                 <h1 className="text-xl font-bold">Income</h1>
                 <div className="flex justify-between">
                   <div className="text-2xl font-bold">LKR {income}</div>
-                  <div
+                  {/* <div
                     className={`text-${
                       incomeChange >= 0 ? "green" : "red"
                     }-500`}
                   >
                     {incomeChange.toFixed(2)} %{" "}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

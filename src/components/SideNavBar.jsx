@@ -35,24 +35,24 @@ export default function SideNavBar() {
       path: "/Order",
       icon: <FaGifts />,
     },
-    {
-      id: 4,
-      name: "Payment",
-      path: "/Payment",
-      icon: <FaMoneyCheckAlt />,
-    },
+    // {
+    //   id: 4,
+    //   name: "Payment",
+    //   path: "/Payment",
+    //   icon: <FaMoneyCheckAlt />,
+    // },
     {
       id: 5,
       name: "Media Manager",
       path: "/Media_Manager",
       icon: <MdPermMedia />,
     },
-    {
-      id: 6,
-      name: "Messages",
-      path: "/Messages",
-      icon: <MdMessage />,
-    },
+    // {
+    //   id: 6,
+    //   name: "Messages",
+    //   path: "/Messages",
+    //   icon: <MdMessage />,
+    // },
   ];
 
   return (

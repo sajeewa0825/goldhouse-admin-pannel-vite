@@ -20,9 +20,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route index element={<Home />} />
           <Route path="Products" element={<Products />} />
           <Route path="Order" element={<Order />} />
-          <Route path="Payment" element={<Payment />} />
+          {/* <Route path="Payment" element={<Payment />} /> */}
           <Route path="Media_Manager" element={<MediaManager />} />
-          <Route path="Messages" element={<Messages />} />
+          {/* <Route path="Messages" element={<Messages />} /> */}
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

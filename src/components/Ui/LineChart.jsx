@@ -1,139 +1,61 @@
-import React from "react";
-import ReactApexChart from "react-apexcharts";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
-class ApexChart extends React.Component {
-  constructor(props) {
-    super(props);
+const SalesChart = () => {
+  const [salesData, setSalesData] = useState([]);
 
-    const dates = [
-      1609459200000, 1609545600000, 1609632000000, 1609718400000, 1609804800000,
-      1609891200000, 1609977600000, 1610064000000, 1610150400000, 1610236800000,
-      1610582400000, 1610668800000, 1610755200000, 1610841600000, 1610928000000,
-    ];
-    const data = [
-      30, 40, 35, 50, 49, 60, 70, 91, 125, 130, 150, 160, 180, 200, 220,
-    ];
-
-    this.state = {
-      series: [
-        {
-          name: "Income",
-          data: data,
-        },
-      ],
-      options: {
-        chart: {
-          type: "area",
-          height: 450,
-          zoom: {
-            type: "x",
-            enabled: true,
-            autoScaleYaxis: true,
-          },
-          toolbar: {
-            show: true,
-            tools: {
-              download: true,
-              selection: true,
-              zoom: true,
-              zoomin: true,
-              zoomout: true,
-              pan: true,
-              reset: true,
-            },
-            autoSelected: "zoom",
-          },
-        },
-        colors: ["#00BFFF"],
-        dataLabels: {
-          enabled: false,
-        },
-        markers: {
-          size: 4,
-          colors: ["#FFFFFF"],
-          strokeColors: "#00BFFF",
-          strokeWidth: 2,
-        },
-        title: {
-          text: "Total Income",
-          align: "center",
-          margin: 20,
-          offsetY: 20,
-          style: {
-            fontSize: "24px",
-            fontWeight: "bold",
-            color: "#263238",
-          },
-        },
-        fill: {
-          type: "gradient",
-          gradient: {
-            shadeIntensity: 1,
-            inverseColors: false,
-            opacityFrom: 0.4,
-            opacityTo: 0.1,
-            stops: [0, 90, 100],
-          },
-        },
-        yaxis: {
-          labels: {
-            formatter: function (val) {
-              return "LKR " + val.toFixed(0);
-            },
-            style: {
-              colors: "#263238",
-              fontSize: "12px",
-            },
-          },
-          title: {
-            text: "Price",
-            style: {
-              fontSize: "14px",
-              fontWeight: "bold",
-              color: "#263238",
-            },
-          },
-        },
-        xaxis: {
-          type: "datetime",
-          categories: dates,
-          labels: {
-            style: {
-              colors: "#263238",
-              fontSize: "12px",
-            },
-          },
-        },
-        tooltip: {
-          shared: true,
-          intersect: false,
-          y: {
-            formatter: function (val) {
-              return "LKR " + val.toFixed(0);
-            },
-          },
-          x: {
-            format: "dd MMM yyyy",
-          },
-        },
-      },
+  useEffect(() => {
+    const fetchSalesData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/order/income-chart-data"
+        );
+        setSalesData(response.data);
+      } catch (error) {
+        console.error("Error fetching sales data:", error);
+      }
     };
-  }
 
-  render() {
-    return (
-      <div className="p-5 bg-white rounded-lg">
-        <div id="chart">
-          <ReactApexChart
-            options={this.state.options}
-            series={this.state.series}
-            type="area"
-            height={450}
+    fetchSalesData();
+  }, []);
+
+  return (
+    <div className="p-5 bg-white rounded-lg">
+      <h2 className="text-2xl font-bold mb-4">Monthly Sales</h2>
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart
+          data={salesData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="date"
+            type="category"
+            allowDuplicatedCategory={false}
           />
-        </div>
-      </div>
-    );
-  }
-}
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line
+            type="monotone"
+            dataKey="totalSales"
+            stroke="#8884d8"
+            activeDot={{ r: 8 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
 
-export default ApexChart;
+export default SalesChart;
