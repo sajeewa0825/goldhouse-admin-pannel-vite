@@ -5,11 +5,17 @@ import axios from "axios";
 const OutOfStock = () => {
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const accessToken = localStorage.getItem('accessToken');
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/product/filter?stock=0");
+        const response = await axios.get(`${backendUrl}/api/product/filter?stock=0`,{
+          headers: {
+              'Authorization': `Bearer ${accessToken}`
+          }
+      });
         setItems(response.data);
         console.log(response.data);
       } catch (error) {
@@ -48,7 +54,7 @@ const OutOfStock = () => {
           >
             <div className="relative">
               <img
-                src={`http://localhost:3000${getImageUrl(item)}`}
+                src={`${backendUrl}${getImageUrl(item)}`}
                 alt={item.title}
                 className="w-full h-48 object-cover"
               />

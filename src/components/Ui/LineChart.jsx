@@ -15,11 +15,17 @@ const SalesChart = () => {
   const [salesData, setSalesData] = useState([]);
 
   useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    const backendUrl = import.meta.env.VITE_BACK_END_URL;
     const fetchSalesData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/order/income-chart-data"
-        );
+          `${backendUrl}/api/order/income-chart-data`
+          ,{
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
         setSalesData(response.data);
       } catch (error) {
         console.error("Error fetching sales data:", error);

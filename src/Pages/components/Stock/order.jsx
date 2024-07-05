@@ -8,11 +8,17 @@ const Orders = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [soldItemCount, setSoldItemCount] = useState({});
   const [searchInput, setSearchInput] = useState("");
+  const accessToken = localStorage.getItem('accessToken');
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/order/get?status=pending");
+        const response = await axios.get(`${backendUrl}/api/order/get?status=pending`,{
+          headers: {
+              'Authorization': `Bearer ${accessToken}`
+          }
+      });
         setItems(response.data); // Set fetched data into state
         console.log(response.data);
       } catch (error) {
@@ -26,7 +32,11 @@ const Orders = () => {
   const handleConform = (itemId) => {
     const conformOrder = async () => {
       try {
-        await axios.put(`http://localhost:3000/api/order/update/${itemId}`);
+        await axios.put(`${backendUrl}/api/order/update/${itemId}`,{
+          headers: {
+              'Authorization': `Bearer ${accessToken}`
+          }
+      });
         setItems(items.filter((item) => item.id !== itemId));
         setSoldItemCount({ ...soldItemCount, [itemId]: (soldItemCount[itemId] || 0) + 1 });
       } catch (error) {
@@ -79,7 +89,7 @@ const Orders = () => {
           >
             <div className="relative">
               <img
-                src={`http://localhost:3000${item.product.images[0].url}`}
+                src={`${backendUrl}${item.product.images[0].url}`}
                 alt={item.product.title}
                 className="w-full h-48 object-cover"
               />

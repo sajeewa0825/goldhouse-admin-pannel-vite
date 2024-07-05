@@ -73,9 +73,13 @@ const ProductAdd = ({ onSubmit }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/product/add', {
+      const backendUrl = import.meta.env.VITE_BACK_END_URL;
+      const response = await fetch(`${backendUrl}/api/product/add`, {
         method: 'POST',
         body: formData,
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+      }
       });
       if (response.ok) {
         console.log('Product added successfully');

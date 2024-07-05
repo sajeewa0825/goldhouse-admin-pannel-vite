@@ -7,6 +7,7 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import axios from "axios";
 
 const UpdateProduct = ({ products }) => {
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
   const [editedProducts, setEditedProducts] = useState([...products]);
   const [editIndex, setEditIndex] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -36,9 +37,10 @@ const UpdateProduct = ({ products }) => {
   });
 
   useEffect(() => {
+    
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/product/all');
+        const response = await axios.get(`${backendUrl}/api/product/all`);
         //console.log(response.data);
         const productsWithImages = response.data.map(product => {
             // console.log(product.images.length);
@@ -46,7 +48,7 @@ const UpdateProduct = ({ products }) => {
               // console.log('run time',i);
               // console.log(product.images[i].url);
               if (product.images[i]) {
-                product.images[i] = `http://localhost:3000${product.images[i].url}`;
+                product.images[i] = `${backendUrl}${product.images[i].url}`;
               }
             }
         });
@@ -86,9 +88,14 @@ const UpdateProduct = ({ products }) => {
 
   const handleSave = async () => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
       const updatedProduct = { ...editFormData };
       console.log(updatedProduct)
-      await axios.put(`http://localhost:3000/api/product/update/${editFormData.id}`, updatedProduct);
+      await axios.put(`${backendUrl}/api/product/update/${editFormData.id}`, updatedProduct, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
       
       const updatedProducts = [...editedProducts];
       updatedProducts[editIndex] = editFormData;

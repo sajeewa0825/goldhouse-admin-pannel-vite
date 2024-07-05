@@ -7,11 +7,17 @@ const Sold = () => {
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchInput, setSearchInput] = useState("");
+  const accessToken = localStorage.getItem('accessToken');
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/order/get?status=sold");
+        const response = await axios.get(`${backendUrl}/api/order/get?status=sold`,{
+          headers: {
+              'Authorization': `Bearer ${accessToken}`
+          }
+      });
         setItems(response.data);
         console.log(response.data);
       } catch (error) {
@@ -62,7 +68,7 @@ const Sold = () => {
           >
             <div className="relative">
               <img
-                src={`http://localhost:3000${item.product.images[0].url}`}
+                src={`${backendUrl}${item.product.images[0].url}`}
                 alt={item.product.title}
                 className="w-full h-48 object-cover"
               />

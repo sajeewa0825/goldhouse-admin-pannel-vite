@@ -11,17 +11,27 @@ function Home() {
   const [prevIncome, setPrevIncome] = useState(0);
   const [customersChange, setCustomersChange] = useState(0);
   const [incomeChange, setIncomeChange] = useState(0);
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const accessToken = localStorage.getItem('accessToken');
         // Fetch total customers
-        const customersResponse = await axios.get('http://localhost:3000/api/user/total-customers');
+        const customersResponse = await axios.get(`${backendUrl}/api/user/total-customers`,{
+          headers: {
+              'Authorization': `Bearer ${accessToken}`
+          }
+      });
         const totalCustomers = customersResponse.data.totalCustomers;
         setCustomersAmount(totalCustomers);
 
         // Fetch total income
-        const incomeResponse = await axios.get('http://localhost:3000/api/order/total-income');
+        const incomeResponse = await axios.get(`${backendUrl}/api/order/total-income`,{
+          headers: {
+              'Authorization': `Bearer ${accessToken}`
+          }
+      });
         const totalIncome = incomeResponse.data[0].totalIncome; // Adjust according to your data structure
         setIncome(totalIncome);
 

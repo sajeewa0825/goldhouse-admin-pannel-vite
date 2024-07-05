@@ -4,11 +4,11 @@ import { MdDeleteForever } from "react-icons/md";
 
 const DeleteProducts = () => {
   const [products, setProducts] = useState([]);
-
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/product/all");
+        const response = await axios.get(`${backendUrl}/api/product/all`);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -20,7 +20,12 @@ const DeleteProducts = () => {
 
   const handleDelete = async (productId) => {
     try {
-      await axios.delete(`http://localhost:3000/api/product/delete/${productId}`);
+      const accessToken = localStorage.getItem('accessToken');
+      await axios.delete(`${backendUrl}/api/product/delete/${productId}`,{
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
       setProducts(products.filter(product => product.id !== productId));
     } catch (error) {
       console.error("Error deleting product:", error);

@@ -3,13 +3,19 @@ import axios from "axios";
 import "./SideBanner.css";
 
 export default function PopularProducts() {
+  const accessToken = localStorage.getItem('accessToken');
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
   const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
   const [showProducts, setShowProducts] = useState(false);
 
   useEffect(() => {
     const fetchMostOrderedProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/order/mostorder");
+        const response = await axios.get(`${backendUrl}/api/order/mostorder`,{
+          headers: {
+              'Authorization': `Bearer ${accessToken}`
+          }
+      });
         setMostOrderedProducts(response.data);
         console.log(response.data);
       } catch (error) {
@@ -53,7 +59,7 @@ export default function PopularProducts() {
                 <tr key={product.id} className="border-b">
                   <td className="flex items-center py-2">
                     <img
-                      src={`http://localhost:3000${getImageUrl(product.product.images)}`} // Adjust image URL as per your backend response structure
+                      src={`${backendUrl}${getImageUrl(product.product.images)}`} // Adjust image URL as per your backend response structure
                       alt={product.title}
                       className="w-18 h-12 mr-3 rounded-md"
                     />
