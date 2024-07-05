@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoHome } from "react-icons/io5";
 import { FaProductHunt, FaGifts, FaMoneyCheckAlt } from "react-icons/fa";
 import { MdMessage, MdPermMedia } from "react-icons/md";
@@ -15,6 +15,12 @@ export default function SideNavBar() {
   useEffect(() => {
     setActive(location.pathname);
   }, [location]);
+
+  const Logout = () => {
+    localStorage.removeItem("accessToken");
+    const navigate = useNavigate();
+    navigate("/login");
+  };
 
   const menu = [
     {
@@ -92,29 +98,18 @@ export default function SideNavBar() {
           </i>
           Help
         </Link>
-        {isLoggedIn ? (
+        {
           <Link
             to="/Logout"
             className="group flex gap-4 mt-3 p-[8px] pl-4 pr-4 text-[16px] items-center text-gray-700 cursor-pointer hover:bg-gray-400 hover:text-white rounded-lg transition-all ease-in-out duration-200"
-            onClick={() => setIsLoggedIn(false)}
+            onClick={() => Logout()}
           >
             <i className="size-4">
               <FiLogOut />
             </i>
             Logout
           </Link>
-        ) : (
-          <Link
-            to="/Login"
-            className="group flex gap-4 mt-3 p-[8px] pl-4 pr-4 text-[16px] items-center text-gray-700 cursor-pointer hover:bg-gray-400 hover:text-white rounded-lg transition-all ease-in-out duration-200"
-            onClick={() => setIsLoggedIn(true)}
-          >
-            <i className="size-4">
-              <FiLogIn />
-            </i>
-            Login
-          </Link>
-        )}
+        }
       </div>
     </div>
   );
