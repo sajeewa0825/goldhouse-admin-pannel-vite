@@ -238,10 +238,13 @@ const ProductAdd = ({ onSubmit }) => {
             label="Category"
             options={[
               { label: "rings", value: "rings"},
-              { label: "Tops", value: "tops" },
-              { label: "Bottoms", value: "bottoms" },
-              { label: "Dresses", value: "dresses" },
-              { label: "Accessories", value: "accessories" },
+              { label: "chains", value: "chains" },
+              { label: "pendants", value: "pendants" },
+              { label: "earrings", value: "earrings" },
+              { label: "bracelets", value: "bracelets" },
+              { label: "anklets", value: "anklets" },
+              { label: "bundles", value: "bundles" },
+              { label: "watches", value: "watches" },
             ]}
             name="category"
             value={product.category}
@@ -303,10 +306,7 @@ const ProductAdd = ({ onSubmit }) => {
             label="Stone"
             options={[
               { label: "natural-diamonds", value: "natural-diamonds" },
-              { label: "Ruby", value: "ruby" },
-              { label: "Sapphire", value: "sapphire" },
-              { label: "Emerald", value: "emerald" },
-              { label: "Topaz", value: "topaz" },
+              { label: "american-diamonds", value: "american-diamonds" },
             ]}
             name="stone"
             value={product.stone}
@@ -330,10 +330,11 @@ const ProductAdd = ({ onSubmit }) => {
             label="Style"
             options={[
               { label: "Cuban", value: "Cuban" },
-              { label: "Vintage", value: "vintage" },
-              { label: "Classic", value: "classic" },
-              { label: "Retro", value: "retro" },
-              { label: "Bohemian", value: "bohemian" },
+              { label: "Tennis", value: "Tennis" },
+              { label: "Figaro", value: "Figaro" },
+              { label: "Rope", value: "Rope" },
+              { label: "Palm", value: "Palm" },
+              { label: "Our Exclusive", value: "Our Exclusive" },
             ]}
             name="style"
             value={product.style}
@@ -366,8 +367,9 @@ const ProductAdd = ({ onSubmit }) => {
             label="Color"
             options={[
               { label: "gold", value: "gold" },
-              { label: "Green", value: "green" },
-              { label: "Blue", value: "blue" },
+              { label: "silver", value: "silver" },
+              { label: "rose gold", value: "rose gold" },
+              { label: "white gold'", value: "white gold'" },
             ]}
             name="color"
             value={product.color}
