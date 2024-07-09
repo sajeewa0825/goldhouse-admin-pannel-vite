@@ -5,6 +5,13 @@ import CustomDropdown from "./CustomDropdown";
 import Cropper from "react-easy-crop";
 import { AiFillCloseCircle } from "react-icons/ai";
 import axios from "axios";
+import Box from "@mui/material/Box";
+import FormLabel from "@mui/material/FormLabel";
+import FormControl from "@mui/material/FormControl";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Checkbox from "@mui/material/Checkbox";
 
 const UpdateProduct = ({ products }) => {
   const backendUrl = import.meta.env.VITE_BACK_END_URL;
@@ -25,10 +32,10 @@ const UpdateProduct = ({ products }) => {
     stock: "",
     metal: "",
     weight: "",
-    length: "",
+    length: [],
     width: "",
     ring_size: "",
-    color: "",
+    color: [],
     stone: "",
     gender: "",
     review: "",
@@ -37,27 +44,41 @@ const UpdateProduct = ({ products }) => {
   });
 
   useEffect(() => {
-    
     const fetchProducts = async () => {
       try {
         const response = await axios.get(`${backendUrl}/api/product/all`);
-        //console.log(response.data);
-        const productsWithImages = response.data.map(product => {
-            // console.log(product.images.length);
-            for (let i = 0; i < product.images.length; i++) {
-              // console.log('run time',i);
-              // console.log(product.images[i].url);
-              if (product.images[i]) {
-                product.images[i] = `${backendUrl}${product.images[i].url}`;
-              }
+        console.log("get data", response.data);
+        const productsWithImages = response.data.map((product) => {
+          // console.log(product.images.length);
+          for (let i = 0; i < product.images.length; i++) {
+            // console.log('run time',i);
+            // console.log(product.images[i].url);
+            if (product.images[i]) {
+              product.images[i] = `${backendUrl}${product.images[i].url}`;
             }
+          }
+
+          if (product.color) {
+            product.color = JSON.parse(product.color);
+            product.color  = product.color.map((color) => {
+              return color.color;
+            }
+            );
+          }
+
+          if (product.length) {
+            product.length = JSON.parse(product.length);
+            product.length = product.length.map((length) => {
+              return length.length;
+            });
+          }
         });
         setEditedProducts(response.data);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error("Error fetching products:", error);
       }
     };
-  
+
     fetchProducts();
   }, []);
   const handleEdit = (index, field, value) => {
@@ -80,30 +101,111 @@ const UpdateProduct = ({ products }) => {
     }
   };
 
+  const findcolorandlength = (product) => {
+    console.log("findcolorandlength");
+    const foundItem = editedProducts.find((item) => item.length === searchValue);
+
+    if (foundItem) {
+      console.log("Found item:", foundItem);
+      return true;
+    } else {
+      console.log("Value not found in the array");
+      return false;
+    }
+  };
+
   const handleImageRemove = (index) => {
     const newImages = [...editFormData.images];
     newImages[index] = null;
     setEditFormData({ ...editFormData, images: newImages });
   };
 
+  const handleCheckboxChange = (e) => {
+    const { name, checked, value } = e.target;
+
+    const updatedProduct = { ...editFormData }; // Create a copy of editFormData
+    if (
+      name === "gold" ||
+      name === "silver" ||
+      name === "rose gold" ||
+      name === "white gold"
+    ) {
+      console.log(name);
+      if (checked) {
+        updatedProduct.color.push(name);
+      } else {
+        for (let i = updatedProduct.color.length - 1; i >= 0; i--) {
+          if (updatedProduct.color[i] === name) {
+            updatedProduct.color.splice(i, 1);
+          }
+        }
+      }
+    } else {
+      console.log(name);
+      if (checked) {
+        updatedProduct.length.push(name);
+      } else {
+        for (let i = updatedProduct.length.length - 1; i >= 0; i--) {
+          if (updatedProduct.length[i] === name) {
+            updatedProduct.length.splice(i, 1);
+          }
+        }
+      }
+    }
+
+    setEditFormData(updatedProduct);
+    console.log(editFormData); // Update state with the modified product object
+  };
+
   const handleSave = async () => {
     try {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem("accessToken");
       const updatedProduct = { ...editFormData };
-      console.log(updatedProduct)
-      await axios.put(`${backendUrl}/api/product/update/${editFormData.id}`, updatedProduct, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
+      console.log(updatedProduct);
+      const formData = new FormData();
+      Object.keys(updatedProduct).forEach((key) => {
+        if (key !== "images" && key !== "length" && key !== "color") {
+          formData.append(key, updatedProduct[key]);
         }
-    });
+      });
+      // for (let i = 0; i < updatedProduct.images.length; i++) {
+      //   if (updatedProduct.images[i]) {
+      //     const response = await fetch(updatedProduct.images[i]);
+      //     const blob = await response.blob();
+      //     formData.append("images", blob, `image-${i}.jpeg`);
+      //   }
+      // }
+  
+      for (let i = 0; i < updatedProduct.length?.length; i++) { // Check if length is defined
+        if (updatedProduct.length[i]) {
+          console.log("length", updatedProduct.length[i]);
+          formData.append("length", updatedProduct.length[i]);
+        }
+      }
       
+      for (let i = 0; i < updatedProduct.color?.length; i++) { // Check if color is defined
+        if (updatedProduct.color[i]) {
+          console.log("color", updatedProduct.color[i]);
+          formData.append("color", updatedProduct.color[i]);
+        }
+      }
+      await axios.put(
+        `${backendUrl}/api/product/update/${editFormData.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
       const updatedProducts = [...editedProducts];
       updatedProducts[editIndex] = editFormData;
       setEditedProducts(updatedProducts);
       setShowPopup(true);
       setTimeout(() => setShowPopup(false), 2000);
       setEditIndex(null);
-      
+
       setEditFormData({
         title: "",
         category: "",
@@ -112,10 +214,10 @@ const UpdateProduct = ({ products }) => {
         stock: "",
         metal: "",
         weight: "",
-        length: "",
+        length: [],
         width: "",
         ringSize: "",
-        color: "",
+        color: [],
         stone: "",
         gender: "",
         review: "",
@@ -123,10 +225,9 @@ const UpdateProduct = ({ products }) => {
         images: [null, null, null, null],
       });
     } catch (error) {
-      console.error('Error updating product:', error);
+      console.error("Error updating product:", error);
     }
   };
-  
 
   const handleEditClick = (index) => {
     setEditIndex(index);
@@ -289,9 +390,9 @@ const UpdateProduct = ({ products }) => {
                 type="text"
                 id="id"
                 value={editFormData.id}
-                onChange={(e) => handleEdit(editIndex, "id", e.target.value)}
                 className="p-3 text-black border-none rounded-lg bg-gray-200 w-full"
                 placeholder="Product ID"
+                disabled
               />
             </div>
 
@@ -317,7 +418,11 @@ const UpdateProduct = ({ products }) => {
                 id="review"
                 value={editFormData.review}
                 onChange={(e) =>
-                  handleEdit(editIndex, "review", e.target.value.replace(/[^0-9]/g, ""))
+                  handleEdit(
+                    editIndex,
+                    "review",
+                    e.target.value.replace(/[^0-9]/g, "")
+                  )
                 }
                 className="p-3 text-black border-none rounded-lg bg-gray-200 w-full"
                 placeholder="Reviews"
@@ -339,7 +444,7 @@ const UpdateProduct = ({ products }) => {
 
             <div className="col-span-3">
               <div className="grid grid-cols-3 font-bold gap-4 my-4 mb-10">
-                <CustomDropdown
+                {/* <CustomDropdown
                   label="Size"
                   options={[
                     { label: "Small", value: "S" },
@@ -353,8 +458,8 @@ const UpdateProduct = ({ products }) => {
                   onChange={(e) =>
                     handleEdit(editIndex, "size", e.target.value)
                   }
-                />
-                <CustomDropdown
+                /> */}
+                {/* <CustomDropdown
                   label="Color"
                   options={[
                     { label: "gold", value: "gold" },
@@ -366,7 +471,7 @@ const UpdateProduct = ({ products }) => {
                   onChange={(e) =>
                     handleEdit(editIndex, "color", e.target.value)
                   }
-                />
+                /> */}
                 <CustomDropdown
                   label="Category"
                   options={[
@@ -398,7 +503,7 @@ const UpdateProduct = ({ products }) => {
                     handleEdit(editIndex, "weight", e.target.value)
                   }
                 />
-                <CustomDropdown
+                {/* <CustomDropdown
                   label="Length"
                   options={[
                     { label: "100cm", value: "100cm" },
@@ -412,7 +517,7 @@ const UpdateProduct = ({ products }) => {
                   onChange={(e) =>
                     handleEdit(editIndex, "length", e.target.value)
                   }
-                />
+                /> */}
                 <CustomDropdown
                   label="Width"
                   options={[
@@ -520,6 +625,108 @@ const UpdateProduct = ({ products }) => {
                     placeholder="description"
                   />
                 </div>
+              </div>
+              <div className="grid grid-cols-3 font-bold gap-4 my-4">
+                <FormControl
+                  sx={{ m: 3 }}
+                  component="fieldset"
+                  variant="standard"
+                >
+                  <FormLabel component="legend"  sx={{ color: "white" } }>Assign Color</FormLabel>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                        checked={editFormData.color.includes("gold")}
+                          onChange={handleCheckboxChange}
+                          name="gold"
+                        />
+                      }
+                      label="gold"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                        checked={editFormData.color.includes("silver")}
+                          onChange={handleCheckboxChange}
+                          name="silver"
+                        />
+                      }
+                      label="silver"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                        checked={editFormData.color.includes("rose gold")}
+                          onChange={handleCheckboxChange}
+                          name="rose gold"
+                        />
+                      }
+                      label="rose gold"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                        checked={editFormData.color.includes("white gold")}
+                          onChange={handleCheckboxChange}
+                          name="white gold"
+                        />
+                      }
+                      label="white gold"
+                    />
+                  </FormGroup>
+                  <FormHelperText>Be careful</FormHelperText>
+                </FormControl>
+                <FormControl
+                  sx={{ m: 3 }}
+                  component="fieldset"
+                  variant="standard"
+                >
+                  <FormLabel component="legend" sx={{ color: "white" }}>Assign Length</FormLabel>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={editFormData.length.includes("100cm")}
+                          onChange={handleCheckboxChange}
+                          name="100cm"
+                        />
+                      }
+                      label="100cm"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                        checked={editFormData.length.includes("200cm")}
+                          onChange={handleCheckboxChange}
+                          name="200cm"
+                        />
+                      }
+                      label="200cm"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                        checked={editFormData.length.includes("300cm")}
+                          onChange={handleCheckboxChange}
+                          name="300cm"
+                        />
+                      }
+                      label="300cm"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                        checked={editFormData.length.includes("400cm")}
+                          onChange={handleCheckboxChange}
+                          name="400cm"
+                        />
+                      }
+                      label="400cm"
+                    />
+                  </FormGroup>
+                  <FormHelperText>Be careful</FormHelperText>
+                </FormControl>
               </div>
 
               {/* Image Upload Grid */}

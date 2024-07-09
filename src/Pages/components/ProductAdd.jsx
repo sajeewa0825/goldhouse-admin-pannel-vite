@@ -2,6 +2,13 @@ import React, { useState, useCallback } from "react";
 import CustomDropdown from "./CustomDropdown";
 import Cropper from "react-easy-crop";
 import { AiFillCloseCircle } from "react-icons/ai";
+import Box from "@mui/material/Box";
+import FormLabel from "@mui/material/FormLabel";
+import FormControl from "@mui/material/FormControl";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Checkbox from "@mui/material/Checkbox";
 
 const ProductAdd = ({ onSubmit }) => {
   const [product, setProduct] = useState({
@@ -12,10 +19,10 @@ const ProductAdd = ({ onSubmit }) => {
     stock: "",
     metal: "",
     weight: "",
-    length: "",
+    length: [],
     width: "",
     ring_size: "",
-    color: "",
+    color: [],
     stone: "",
     gender: "",
     review: "",
@@ -47,6 +54,43 @@ const ProductAdd = ({ onSubmit }) => {
     }
   };
 
+  const handleCheckboxChange = (e) => {
+    const { name, checked, value } = e.target;
+
+    const updatedProduct = { ...product }; // Create a copy of product
+    if (
+      name === "gold" ||
+      name === "silver" ||
+      name === "rose gold" ||
+      name === "white gold"
+    ) {
+      //console.log(name);
+      if (checked) {
+        updatedProduct.color.push(name);
+      } else {
+        for (let i = updatedProduct.color.length - 1; i >= 0; i--) {
+          if (updatedProduct.color[i] === name) {
+            updatedProduct.color.splice(i, 1);
+          }
+        }
+      }
+    } else {
+      //console.log(name);
+      if (checked) {
+        updatedProduct.length.push(name);
+      } else {
+        for (let i = updatedProduct.length.length - 1; i >= 0; i--) {
+          if (updatedProduct.length[i] === name) {
+            updatedProduct.length.splice(i, 1);
+          }
+        }
+      }
+    }
+
+    setProduct(updatedProduct);
+    console.log(product); // Update state with the modified product object
+  };
+
   const handleImageRemove = (e, index) => {
     e.stopPropagation();
     e.preventDefault();
@@ -57,10 +101,10 @@ const ProductAdd = ({ onSubmit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData();
-    Object.keys(product).forEach(key => {
-      if (key !== 'images') {
+    Object.keys(product).forEach((key) => {
+      if (key !== "images" && key !== "length" && key !== "color") {
         formData.append(key, product[key]);
       }
     });
@@ -68,21 +112,37 @@ const ProductAdd = ({ onSubmit }) => {
       if (product.images[i]) {
         const response = await fetch(product.images[i]);
         const blob = await response.blob();
-        formData.append('images', blob, `image-${i}.jpeg`);
+        formData.append("images", blob, `image-${i}.jpeg`);
       }
     }
+
+    for (let i = 0; i < product.length?.length; i++) { // Check if length is defined
+      if (product.length[i]) {
+        console.log("length", product.length[i]);
+        formData.append("length", product.length[i]);
+      }
+    }
+    
+    for (let i = 0; i < product.color?.length; i++) { // Check if color is defined
+      if (product.color[i]) {
+        console.log("color", product.color[i]);
+        formData.append("color", product.color[i]);
+      }
+    }
+
+    console.log("form  data ", formData)
 
     try {
       const backendUrl = import.meta.env.VITE_BACK_END_URL;
       const response = await fetch(`${backendUrl}/api/product/add`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
         headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-      }
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
       });
       if (response.ok) {
-        console.log('Product added successfully');
+        console.log("Product added successfully");
         setProduct({
           title: "",
           category: "",
@@ -91,10 +151,10 @@ const ProductAdd = ({ onSubmit }) => {
           stock: "",
           metal: "",
           weight: "",
-          length: "",
+          length: [],
           width: "",
           ring_size: "",
-          color: "",
+          color: [],
           stone: "",
           gender: "",
           review: "",
@@ -102,10 +162,10 @@ const ProductAdd = ({ onSubmit }) => {
           images: [null, null, null, null],
         });
       } else {
-        console.error('Failed to add product');
+        console.error("Failed to add product");
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
@@ -237,7 +297,7 @@ const ProductAdd = ({ onSubmit }) => {
           <CustomDropdown
             label="Category"
             options={[
-              { label: "rings", value: "rings"},
+              { label: "rings", value: "rings" },
               { label: "chains", value: "chains" },
               { label: "pendants", value: "pendants" },
               { label: "earrings", value: "earrings" },
@@ -263,7 +323,7 @@ const ProductAdd = ({ onSubmit }) => {
             value={product.weight}
             onChange={handleChange}
           />
-          <CustomDropdown
+          {/* <CustomDropdown
             label="Length"
             options={[
               { label: "100cm", value: "100cm" },
@@ -275,7 +335,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="length"
             value={product.length}
             onChange={handleChange}
-          />
+          /> */}
           <CustomDropdown
             label="Width"
             options={[
@@ -363,18 +423,100 @@ const ProductAdd = ({ onSubmit }) => {
             value={product.size}
             onChange={handleChange}
           />
-          <CustomDropdown
-            label="Color"
-            options={[
-              { label: "gold", value: "gold" },
-              { label: "silver", value: "silver" },
-              { label: "rose gold", value: "rose gold" },
-              { label: "white gold'", value: "white gold'" },
-            ]}
-            name="color"
-            value={product.color}
-            onChange={handleChange}
-          />
+        </div>
+        <div className="grid grid-cols-3 font-bold gap-4 my-4">
+          <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+            <FormLabel component="legend">Assign Color</FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    // checked={gilad}
+                    onChange={handleCheckboxChange}
+                    name="gold"
+                  />
+                }
+                label="gold"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    // checked={jason}
+                    onChange={handleCheckboxChange}
+                    name="silver"
+                  />
+                }
+                label="silver"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    // checked={antoine}
+                    onChange={handleCheckboxChange}
+                    name="rose gold"
+                  />
+                }
+                label="rose gold"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    // checked={antoine}
+                    onChange={handleCheckboxChange}
+                    name="white gold"
+                  />
+                }
+                label="white gold"
+              />
+            </FormGroup>
+            <FormHelperText>Be careful</FormHelperText>
+          </FormControl>
+          <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+            <FormLabel component="legend">Assign Length</FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    // checked={gilad}
+                    onChange={handleCheckboxChange}
+                    name="100cm"
+                  />
+                }
+                label="100cm"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    // checked={jason}
+                    onChange={handleCheckboxChange}
+                    name="200cm"
+                  />
+                }
+                label="200cm"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    // checked={antoine}
+                    onChange={handleCheckboxChange}
+                    name="300cm"
+                  />
+                }
+                label="300cm"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    // checked={antoine}
+                    onChange={handleCheckboxChange}
+                    name="400cm"
+                  />
+                }
+                label="400cm"
+              />
+            </FormGroup>
+            <FormHelperText>Be careful</FormHelperText>
+          </FormControl>
         </div>
         <div className="grid grid-cols-8 gap-5 mt-4">
           <div className="col-span-6 bg-gray-200 p-2 h-full">
