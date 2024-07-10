@@ -4,7 +4,9 @@ import { MdDeleteForever } from "react-icons/md";
 
 const DeleteProducts = () => {
   const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
   const backendUrl = import.meta.env.VITE_BACK_END_URL;
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -12,6 +14,7 @@ const DeleteProducts = () => {
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
+        setError("Failed to fetch products. Please try again later.");
       }
     };
 
@@ -20,21 +23,31 @@ const DeleteProducts = () => {
 
   const handleDelete = async (productId) => {
     try {
-      const accessToken = localStorage.getItem('accessToken');
-      await axios.delete(`${backendUrl}/api/product/delete/${productId}`,{
+      const accessToken = localStorage.getItem("accessToken");
+      await axios.delete(`${backendUrl}/api/product/delete/${productId}`, {
         headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-      setProducts(products.filter(product => product.id !== productId));
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setProducts(products.filter((product) => product.id !== productId));
+      setError(null);
     } catch (error) {
       console.error("Error deleting product:", error);
+      
+      setError(error.response.data.error || "Failed to delete product. Please try again later.");
     }
   };
+
+  
 
   return (
     <div className="p-5 rounded-xl bg-gray-900 text-white">
       <h2 className="font-bold text-lg mb-4">Delete Products</h2>
+      {error && (
+        <div className="mb-4 p-2 bg-red-600 text-white rounded">
+          {error}
+        </div>
+      )}
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto bg-gray-800 rounded-lg">
           <thead>

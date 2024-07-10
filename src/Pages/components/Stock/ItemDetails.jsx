@@ -3,6 +3,17 @@ import React from "react";
 function ItemDetails({ selectedItem, onClose, pageIdentifier, onConform }) {
   if (!selectedItem) return null;
 
+  const colormap = (data)=>{
+    console.log(data); 
+    const data1 = JSON.parse(data);
+
+    const color = data1.map((color) => {
+      return color.color;
+    });
+
+    return color.join(", ");
+  }
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg p-8 max-w-screen-md w-full relative shadow-inner">
@@ -54,7 +65,7 @@ function ItemDetails({ selectedItem, onClose, pageIdentifier, onConform }) {
               </p>
               <hr className="my-2" />
               <p className="text-gray-700">
-                <span className="font-bold">Color :</span> {selectedItem.product.color}
+                <span className="font-bold">Color :</span> {colormap(selectedItem.product.color)}
               </p>
               <p className="text-gray-700">
                 <span className="font-bold">Quantity :</span> {selectedItem.quantity}

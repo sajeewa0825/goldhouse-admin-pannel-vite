@@ -30,22 +30,28 @@ const Orders = () => {
   }, []); // Empty dependency array ensures this runs only once
 
   const handleConform = (itemId) => {
+    console.log(itemId);
+    console.log(localStorage.getItem("accessToken"));
     const conformOrder = async () => {
       try {
-        await axios.put(`${backendUrl}/api/order/update/${itemId}`,{
-          headers: {
-              'Authorization': `Bearer ${accessToken}`
+        const response = await axios.put(
+          `${backendUrl}/api/order/update/${itemId}`, 
+          {}, // Add an empty object here as the request body if you don't have any data to send in the body
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
+            },
           }
-      });
+        );
         setItems(items.filter((item) => item.id !== itemId));
         setSoldItemCount({ ...soldItemCount, [itemId]: (soldItemCount[itemId] || 0) + 1 });
       } catch (error) {
         console.error("Error conforming order:", error);
       }
     };
-
+  
     conformOrder();
-
+  
     setSelectedItem(null);
   };
 

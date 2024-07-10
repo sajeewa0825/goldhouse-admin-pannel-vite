@@ -213,7 +213,7 @@ const UpdateProduct = ({ products }) => {
             const response = await fetch(image);
             const blob = await response.blob();
             formData.append("images", blob, `image-${i}.jpeg`);
-          } else if (image.startsWith("http://localhost:3000/uploads/")) {
+          } else if (image.startsWith(`${backendUrl}/uploads/`)) {
             // Handle external URLs
             const response = await fetch(image);
             console.log(response);
