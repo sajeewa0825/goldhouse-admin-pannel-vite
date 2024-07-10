@@ -2,6 +2,7 @@ import React from "react";
 
 function ItemDetails({ selectedItem, onClose, pageIdentifier, onConform }) {
   if (!selectedItem) return null;
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
 
   const colormap = (data)=>{
     console.log(data); 
@@ -43,7 +44,7 @@ function ItemDetails({ selectedItem, onClose, pageIdentifier, onConform }) {
         <div className="flex gap-5">
           <div>
             <img
-              src={`http://localhost:3000${selectedItem.product.images[0].url}`}
+              src={`${backendUrl}${selectedItem.product.images[0].url}`}
               alt={selectedItem.tittle}
               className="w-full h-full object-cover"
             />
@@ -114,14 +115,6 @@ function ItemDetails({ selectedItem, onClose, pageIdentifier, onConform }) {
                 <h2 className="font-bold">{selectedItem.totalPrice} /=</h2>
               </span>
             </div>
-          ) : null}
-          {pageIdentifier === "orders" ? (
-            <button
-              className="mt-4 bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600"
-              onClick={onClose}
-            >
-              Send Mail
-            </button>
           ) : null}
           {pageIdentifier === "orders" ? (
             <button
