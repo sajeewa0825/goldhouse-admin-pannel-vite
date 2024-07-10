@@ -110,27 +110,31 @@ const ProductAdd = ({ onSubmit }) => {
     });
     for (let i = 0; i < product.images.length; i++) {
       if (product.images[i]) {
+        console.log("image", product.images);
         const response = await fetch(product.images[i]);
+        console.log("response", response);
         const blob = await response.blob();
         formData.append("images", blob, `image-${i}.jpeg`);
       }
     }
 
-    for (let i = 0; i < product.length?.length; i++) { // Check if length is defined
+    for (let i = 0; i < product.length?.length; i++) {
+      // Check if length is defined
       if (product.length[i]) {
         console.log("length", product.length[i]);
         formData.append("length", product.length[i]);
       }
     }
-    
-    for (let i = 0; i < product.color?.length; i++) { // Check if color is defined
+
+    for (let i = 0; i < product.color?.length; i++) {
+      // Check if color is defined
       if (product.color[i]) {
         console.log("color", product.color[i]);
         formData.append("color", product.color[i]);
       }
     }
 
-    console.log("form  data ", formData)
+    console.log("form  data ", formData);
 
     try {
       const backendUrl = import.meta.env.VITE_BACK_END_URL;
@@ -431,7 +435,7 @@ const ProductAdd = ({ onSubmit }) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    // checked={gilad}
+                    checked={product.color.includes("gold")}
                     onChange={handleCheckboxChange}
                     name="gold"
                   />
@@ -441,7 +445,7 @@ const ProductAdd = ({ onSubmit }) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    // checked={jason}
+                    checked={product.color.includes("silver")}
                     onChange={handleCheckboxChange}
                     name="silver"
                   />
@@ -451,7 +455,7 @@ const ProductAdd = ({ onSubmit }) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    // checked={antoine}
+                    checked={product.color.includes("rose gold")}
                     onChange={handleCheckboxChange}
                     name="rose gold"
                   />
@@ -461,7 +465,7 @@ const ProductAdd = ({ onSubmit }) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    // checked={antoine}
+                    checked={product.color.includes("white gold")}
                     onChange={handleCheckboxChange}
                     name="white gold"
                   />
@@ -477,7 +481,7 @@ const ProductAdd = ({ onSubmit }) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    // checked={gilad}
+                    checked={product.length.includes("100cm")}
                     onChange={handleCheckboxChange}
                     name="100cm"
                   />
@@ -487,7 +491,7 @@ const ProductAdd = ({ onSubmit }) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    // checked={jason}
+                    checked={product.length.includes("200cm")}
                     onChange={handleCheckboxChange}
                     name="200cm"
                   />
@@ -497,7 +501,7 @@ const ProductAdd = ({ onSubmit }) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    // checked={antoine}
+                    checked={product.length.includes("300cm")}
                     onChange={handleCheckboxChange}
                     name="300cm"
                   />
@@ -507,7 +511,7 @@ const ProductAdd = ({ onSubmit }) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    // checked={antoine}
+                    checked={product.length.includes("400cm")}
                     onChange={handleCheckboxChange}
                     name="400cm"
                   />

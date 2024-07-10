@@ -60,10 +60,9 @@ const UpdateProduct = ({ products }) => {
 
           if (product.color) {
             product.color = JSON.parse(product.color);
-            product.color  = product.color.map((color) => {
+            product.color = product.color.map((color) => {
               return color.color;
-            }
-            );
+            });
           }
 
           if (product.length) {
@@ -101,9 +100,45 @@ const UpdateProduct = ({ products }) => {
     }
   };
 
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/api/product/all`);
+      console.log("get data", response.data);
+      const productsWithImages = response.data.map((product) => {
+        // console.log(product.images.length);
+        for (let i = 0; i < product.images.length; i++) {
+          // console.log('run time',i);
+          // console.log(product.images[i].url);
+          if (product.images[i]) {
+            product.images[i] = `${backendUrl}${product.images[i].url}`;
+          }
+        }
+
+        if (product.color) {
+          product.color = JSON.parse(product.color);
+          product.color = product.color.map((color) => {
+            return color.color;
+          });
+        }
+
+        if (product.length) {
+          product.length = JSON.parse(product.length);
+          product.length = product.length.map((length) => {
+            return length.length;
+          });
+        }
+      });
+      setEditedProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
   const findcolorandlength = (product) => {
     console.log("findcolorandlength");
-    const foundItem = editedProducts.find((item) => item.length === searchValue);
+    const foundItem = editedProducts.find(
+      (item) => item.length === searchValue
+    );
 
     if (foundItem) {
       console.log("Found item:", foundItem);
@@ -154,7 +189,7 @@ const UpdateProduct = ({ products }) => {
     }
 
     setEditFormData(updatedProduct);
-    console.log(editFormData); // Update state with the modified product object
+    //console.log(editFormData); // Update state with the modified product object
   };
 
   const handleSave = async () => {
@@ -168,22 +203,45 @@ const UpdateProduct = ({ products }) => {
           formData.append(key, updatedProduct[key]);
         }
       });
-      // for (let i = 0; i < updatedProduct.images.length; i++) {
-      //   if (updatedProduct.images[i]) {
-      //     const response = await fetch(updatedProduct.images[i]);
-      //     const blob = await response.blob();
-      //     formData.append("images", blob, `image-${i}.jpeg`);
-      //   }
-      // }
-  
-      for (let i = 0; i < updatedProduct.length?.length; i++) { // Check if length is defined
+      for (let i = 0; i < updatedProduct.images.length; i++) {
+        const image = updatedProduct.images[i];
+        //console.log("images", image);
+        if (image) {
+          if (image.startsWith("blob:")) {
+            // Handle blob URLs
+            console.log("blob", image);
+            const response = await fetch(image);
+            const blob = await response.blob();
+            formData.append("images", blob, `image-${i}.jpeg`);
+          } else if (image.startsWith("http://localhost:3000/uploads/")) {
+            // Handle external URLs
+            const response = await fetch(image);
+            console.log(response);
+            if (response.ok) {
+              const blob = await response.blob();
+              console.log("blod", blob);
+              formData.append("images", blob, `image-${i}.jpeg`);
+            } else {
+              console.error("Failed to fetch image from URL:", image);
+              // Optionally handle the error, e.g., skip this image or add a placeholder
+            }
+          } else {
+            // If it's neither a blob nor a known external URL, handle accordingly
+            console.warn("Unknown image URL format:", image);
+          }
+        }
+      }
+
+      for (let i = 0; i < updatedProduct.length?.length; i++) {
+        // Check if length is defined
         if (updatedProduct.length[i]) {
           console.log("length", updatedProduct.length[i]);
           formData.append("length", updatedProduct.length[i]);
         }
       }
-      
-      for (let i = 0; i < updatedProduct.color?.length; i++) { // Check if color is defined
+
+      for (let i = 0; i < updatedProduct.color?.length; i++) {
+        // Check if color is defined
         if (updatedProduct.color[i]) {
           console.log("color", updatedProduct.color[i]);
           formData.append("color", updatedProduct.color[i]);
@@ -198,6 +256,8 @@ const UpdateProduct = ({ products }) => {
           },
         }
       );
+
+      
 
       const updatedProducts = [...editedProducts];
       updatedProducts[editIndex] = editFormData;
@@ -224,6 +284,7 @@ const UpdateProduct = ({ products }) => {
         style: "",
         images: [null, null, null, null],
       });
+      fetchProducts();
     } catch (error) {
       console.error("Error updating product:", error);
     }
@@ -632,12 +693,14 @@ const UpdateProduct = ({ products }) => {
                   component="fieldset"
                   variant="standard"
                 >
-                  <FormLabel component="legend"  sx={{ color: "white" } }>Assign Color</FormLabel>
+                  <FormLabel component="legend" sx={{ color: "white" }}>
+                    Assign Color
+                  </FormLabel>
                   <FormGroup>
                     <FormControlLabel
                       control={
                         <Checkbox
-                        checked={editFormData.color.includes("gold")}
+                          checked={editFormData.color.includes("gold")}
                           onChange={handleCheckboxChange}
                           name="gold"
                         />
@@ -647,7 +710,7 @@ const UpdateProduct = ({ products }) => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                        checked={editFormData.color.includes("silver")}
+                          checked={editFormData.color.includes("silver")}
                           onChange={handleCheckboxChange}
                           name="silver"
                         />
@@ -657,7 +720,7 @@ const UpdateProduct = ({ products }) => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                        checked={editFormData.color.includes("rose gold")}
+                          checked={editFormData.color.includes("rose gold")}
                           onChange={handleCheckboxChange}
                           name="rose gold"
                         />
@@ -667,7 +730,7 @@ const UpdateProduct = ({ products }) => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                        checked={editFormData.color.includes("white gold")}
+                          checked={editFormData.color.includes("white gold")}
                           onChange={handleCheckboxChange}
                           name="white gold"
                         />
@@ -682,7 +745,9 @@ const UpdateProduct = ({ products }) => {
                   component="fieldset"
                   variant="standard"
                 >
-                  <FormLabel component="legend" sx={{ color: "white" }}>Assign Length</FormLabel>
+                  <FormLabel component="legend" sx={{ color: "white" }}>
+                    Assign Length
+                  </FormLabel>
                   <FormGroup>
                     <FormControlLabel
                       control={
@@ -697,7 +762,7 @@ const UpdateProduct = ({ products }) => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                        checked={editFormData.length.includes("200cm")}
+                          checked={editFormData.length.includes("200cm")}
                           onChange={handleCheckboxChange}
                           name="200cm"
                         />
@@ -707,7 +772,7 @@ const UpdateProduct = ({ products }) => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                        checked={editFormData.length.includes("300cm")}
+                          checked={editFormData.length.includes("300cm")}
                           onChange={handleCheckboxChange}
                           name="300cm"
                         />
@@ -717,7 +782,7 @@ const UpdateProduct = ({ products }) => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                        checked={editFormData.length.includes("400cm")}
+                          checked={editFormData.length.includes("400cm")}
                           onChange={handleCheckboxChange}
                           name="400cm"
                         />
