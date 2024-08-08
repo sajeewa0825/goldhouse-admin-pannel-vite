@@ -182,7 +182,7 @@ function MediaManager() {
               <Grid item key={imgIndex} xs={12} sm={6} md={4} lg={3}>
                 <MediaBox>
                   <img
-                    src={`${backendUrl}${image.url}`}
+                    src={`${image.url}`}
                     alt={`Uploaded ${imgIndex}`}
                     style={{ width: "100%" }}
                   />

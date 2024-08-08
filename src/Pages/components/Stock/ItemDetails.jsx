@@ -44,7 +44,7 @@ function ItemDetails({ selectedItem, onClose, pageIdentifier, onConform }) {
         <div className="flex gap-5">
           <div>
             <img
-              src={`${backendUrl}${selectedItem.product.images[0].url}`}
+              src={`${selectedItem.product.images[0].url}`}
               alt={selectedItem.tittle}
               className="w-full h-full object-cover"
             />

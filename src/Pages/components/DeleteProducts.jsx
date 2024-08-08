@@ -55,7 +55,7 @@ const DeleteProducts = () => {
               <th className="px-4 py-2 ">Product</th>
               <th className="px-4 py-2">Category</th>
               <th className="px-4 py-2">Product ID</th>
-              <th className="px-4 py-2">Date</th>
+              <th className="px-4 py-2">Gender</th>
               <th className="px-4 py-2">Action</th>
             </tr>
           </thead>
@@ -68,7 +68,7 @@ const DeleteProducts = () => {
                 <td className="px-4 py-2">{product.title}</td>
                 <td className="px-4 py-2">{product.category}</td>
                 <td className="px-4 py-2">{product.id}</td>
-                <td className="px-4 py-2">{product.date}</td>
+                <td className="px-4 py-2">{product.gender}</td>
                 <td className="px-4 py-2">
                   <button
                     onClick={() => handleDelete(product.id)}

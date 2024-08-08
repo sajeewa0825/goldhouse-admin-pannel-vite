@@ -54,7 +54,7 @@ const OutOfStock = () => {
           >
             <div className="relative">
               <img
-                src={`${backendUrl}${getImageUrl(item)}`}
+                src={`${getImageUrl(item)}`}
                 alt={item.title}
                 className="w-full h-48 object-cover"
               />

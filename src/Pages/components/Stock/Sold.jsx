@@ -68,7 +68,7 @@ const Sold = () => {
           >
             <div className="relative">
               <img
-                src={`${backendUrl}${item.product.images[0].url}`}
+                src={`${item.product.images[0].url}`}
                 alt={item.product.title}
                 className="w-full h-48 object-cover"
               />

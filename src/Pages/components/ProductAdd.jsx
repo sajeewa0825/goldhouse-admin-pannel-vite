@@ -25,7 +25,6 @@ const ProductAdd = ({ onSubmit }) => {
     color: [],
     stone: "",
     gender: "",
-    review: "",
     style: "",
     images: [null, null, null, null], // Initialize with placeholders for 4 image slots
   });
@@ -161,7 +160,6 @@ const ProductAdd = ({ onSubmit }) => {
           color: [],
           stone: "",
           gender: "",
-          review: "",
           style: "",
           images: [null, null, null, null],
         });
@@ -261,6 +259,7 @@ const ProductAdd = ({ onSubmit }) => {
               onChange={handleChange}
               placeholder="Product Name"
               className="p-3 border-none rounded-lg bg-gray-200"
+              required
             />
             <input
               type="number"
@@ -269,14 +268,7 @@ const ProductAdd = ({ onSubmit }) => {
               onChange={handleChange}
               placeholder="Price"
               className="p-3 border-none rounded-lg bg-gray-200"
-            />
-            <input
-              type="number"
-              name="review"
-              value={product.review}
-              onChange={handleChange}
-              placeholder="Review"
-              className="p-3 border-none rounded-lg bg-gray-200"
+              required
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-1">
@@ -286,6 +278,7 @@ const ProductAdd = ({ onSubmit }) => {
               onChange={handleChange}
               placeholder="Product Description"
               className="p-3 border-none rounded-lg bg-gray-200"
+              required
             />
           </div>
         </div>
@@ -297,6 +290,7 @@ const ProductAdd = ({ onSubmit }) => {
             onChange={handleChange}
             placeholder="Stock"
             className="p-3 border-none rounded-lg bg-gray-200"
+            required
           />
           <CustomDropdown
             label="Category"
@@ -313,6 +307,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="category"
             value={product.category}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Weight"
@@ -326,6 +321,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="weight"
             value={product.weight}
             onChange={handleChange}
+            required
           />
           {/* <CustomDropdown
             label="Length"
@@ -352,6 +348,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="width"
             value={product.width}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Ring Size"
@@ -365,6 +362,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="ring_size"
             value={product.ring_size}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Stone"
@@ -375,6 +373,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="stone"
             value={product.stone}
             onChange={handleChange}
+            required
           />
 
           <CustomDropdown
@@ -389,6 +388,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="metal"
             value={product.metal}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Style"
@@ -403,6 +403,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="style"
             value={product.style}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Gender"
@@ -413,19 +414,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="gender"
             value={product.gender}
             onChange={handleChange}
-          />
-          <CustomDropdown
-            label="Size"
-            options={[
-              { label: "Small", value: "S" },
-              { label: "Medium", value: "M" },
-              { label: "Large", value: "L" },
-              { label: "Extra Large", value: "XL" },
-              { label: "XXL", value: "XXL" },
-            ]}
-            name="size"
-            value={product.size}
-            onChange={handleChange}
+            required
           />
         </div>
         <div className="grid grid-cols-3 font-bold gap-4 my-4">

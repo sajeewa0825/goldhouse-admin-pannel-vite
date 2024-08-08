@@ -54,7 +54,7 @@ const UpdateProduct = ({ products }) => {
             // console.log('run time',i);
             // console.log(product.images[i].url);
             if (product.images[i]) {
-              product.images[i] = `${backendUrl}${product.images[i].url}`;
+              product.images[i] = `${product.images[i].url}`;
             }
           }
 
@@ -110,7 +110,7 @@ const UpdateProduct = ({ products }) => {
           // console.log('run time',i);
           // console.log(product.images[i].url);
           if (product.images[i]) {
-            product.images[i] = `${backendUrl}${product.images[i].url}`;
+            product.images[i] = `${product.images[i].url}`;
           }
         }
 
@@ -213,7 +213,7 @@ const UpdateProduct = ({ products }) => {
             const response = await fetch(image);
             const blob = await response.blob();
             formData.append("images", blob, `image-${i}.jpeg`);
-          } else if (image.startsWith(`${backendUrl}/uploads/`)) {
+          } else if (image.startsWith(`https://res.cloudinary.com/`)) {
             // Handle external URLs
             const response = await fetch(image);
             console.log(response);
@@ -468,25 +468,6 @@ const UpdateProduct = ({ products }) => {
                 onChange={(e) => handleEdit(editIndex, "price", e.target.value)}
                 className="p-3 text-black border-none rounded-lg bg-gray-200 w-full"
                 placeholder="price"
-              />
-            </div>
-            <div>
-              <label htmlFor="review" className="block text-sm font-bold mb-2">
-                Review
-              </label>
-              <input
-                type="text"
-                id="review"
-                value={editFormData.review}
-                onChange={(e) =>
-                  handleEdit(
-                    editIndex,
-                    "review",
-                    e.target.value.replace(/[^0-9]/g, "")
-                  )
-                }
-                className="p-3 text-black border-none rounded-lg bg-gray-200 w-full"
-                placeholder="Reviews"
               />
             </div>
             <div>

@@ -59,7 +59,7 @@ export default function PopularProducts() {
                 <tr key={product.id} className="border-b">
                   <td className="flex items-center py-2">
                     <img
-                      src={`${backendUrl}${getImageUrl(product.product.images)}`} // Adjust image URL as per your backend response structure
+                      src={`${getImageUrl(product.product.images)}`} // Adjust image URL as per your backend response structure
                       alt={product.title}
                       className="w-18 h-12 mr-3 rounded-md"
                     />
