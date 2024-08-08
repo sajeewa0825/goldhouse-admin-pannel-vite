@@ -2,6 +2,18 @@ import React from "react";
 
 function ItemDetails({ selectedItem, onClose, pageIdentifier, onConform }) {
   if (!selectedItem) return null;
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
+
+  const colormap = (data)=>{
+    console.log(data); 
+    const data1 = JSON.parse(data);
+
+    const color = data1.map((color) => {
+      return color.color;
+    });
+
+    return color.join(", ");
+  }
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
@@ -32,98 +44,77 @@ function ItemDetails({ selectedItem, onClose, pageIdentifier, onConform }) {
         <div className="flex gap-5">
           <div>
             <img
-              src={`https://via.placeholder.com/300x200?text=${selectedItem.name}`}
-              alt={selectedItem.name}
+              src={`${selectedItem.product.images[0].url}`}
+              alt={selectedItem.tittle}
               className="w-full h-full object-cover"
             />
           </div>
           {pageIdentifier === "orders" ? (
             <div>
-              <h2 className="text-2xl font-bold">{selectedItem.name}</h2>
+              <h2 className="text-2xl font-bold">{selectedItem.product.tittle}</h2>
               <p className="text-gray-700 mt-2">
-                <span className="font-bold">Name :</span>{" "}
-                {selectedItem.customer}
+                <span className="font-bold">Name :</span> {selectedItem.name}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Address :</span>{" "}
-                {selectedItem.Address}
+                <span className="font-bold">Address :</span> {selectedItem.address}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">E-Mail :</span> {selectedItem.Mail}
+                <span className="font-bold">E-Mail :</span> {selectedItem.user.email}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Phone :</span> {selectedItem.Phone}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-bold">Postal Code :</span>{" "}
-                {selectedItem.PostalCode}
+                <span className="font-bold">Phone :</span> {selectedItem.phone}
               </p>
               <hr className="my-2" />
               <p className="text-gray-700">
-                <span className="font-bold">Color :</span> {selectedItem.color}
+                <span className="font-bold">Color :</span> {colormap(selectedItem.product.color)}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Quantity :</span>{" "}
-                {selectedItem.amount}
+                <span className="font-bold">Quantity :</span> {selectedItem.quantity}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Size :</span> {selectedItem.size}
+                <span className="font-bold">Size :</span> {selectedItem.product.ring_size}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Material :</span>{" "}
-                {selectedItem.material}
+                <span className="font-bold">Material :</span> {selectedItem.product.metal}
               </p>
             </div>
           ) : (
             <div>
               <h2 className="text-2xl font-bold">{selectedItem.name}</h2>
               <p className="text-gray-700 mt-2">
-                <span className="font-bold">Color :</span> {selectedItem.color}
+                <span className="font-bold">Name :</span> {selectedItem.name}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Quantity :</span>{" "}
-                {selectedItem.amount}
+                <span className="font-bold">Address :</span> {selectedItem.address}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Size :</span> {selectedItem.size}
+                <span className="font-bold">E-Mail :</span> {selectedItem.user.email}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Material :</span>{" "}
-                {selectedItem.material}
+                <span className="font-bold">Phone :</span> {selectedItem.phone}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Price :</span> {selectedItem.price}
+                <span className="font-bold">Price :</span> {selectedItem.totalPrice}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Stock :</span> {selectedItem.stock}
+                <span className="font-bold">Quantity :</span> {selectedItem.quantity}
               </p>
               <p className="text-gray-700">
-                <span className="font-bold">Reviews :</span>{" "}
-                {selectedItem.reviews}
+                <span className="font-bold">Order Create Date :</span> {selectedItem.createdAt}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-bold">Order Confrom Date :</span> {selectedItem.updatedAt}
               </p>
             </div>
           )}
         </div>
         <div className="flex justify-end gap-5 items-center relative">
-          {/* Total price */}
           {pageIdentifier === "orders" ? (
-            <div className="absolute left-0 bottom-0 text-lg bg-black px-3 py-1 rounded-md ">
-              <p className="text-white flex items-center">
-                <h2 className="font-bold">
-                  {selectedItem.amount * selectedItem.orders} /=
-                </h2>
-              </p>
+            <div className="absolute left-0 bottom-0 text-lg bg-black px-3 py-1 rounded-md">
+              <span className="text-white">
+                <h2 className="font-bold">{selectedItem.totalPrice} /=</h2>
+              </span>
             </div>
-          ) : null}
-
-          {/* Buttons */}
-          {pageIdentifier === "orders" ? (
-            <button
-              className="mt-4 bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600"
-              onClick={onClose}
-            >
-              Send Mail
-            </button>
           ) : null}
           {pageIdentifier === "orders" ? (
             <button

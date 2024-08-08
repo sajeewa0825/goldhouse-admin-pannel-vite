@@ -1,105 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./SideBanner.css";
 
-const popularProducts = [
-  {
-    id: 1,
-    name: "Product A",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 2,
-    name: "Product B",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 3,
-    name: "Product C",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 4,
-    name: "Product D",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 5,
-    name: "Product E",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 6,
-    name: "Product F",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 7,
-    name: "Product G",
-    type: "Typet",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 8,
-    name: "Product H",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 9,
-    name: "Product I",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 10,
-    name: "Product J",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 11,
-    name: "Product K",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 12,
-    name: "Product L",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-  {
-    id: 13,
-    name: "Product M",
-    type: "Type",
-    earnings: "LKR 200",
-    image: "/Images/22.jpeg",
-  },
-];
-
 export default function PopularProducts() {
+  const accessToken = localStorage.getItem('accessToken');
+  const backendUrl = import.meta.env.VITE_BACK_END_URL;
+  const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
   const [showProducts, setShowProducts] = useState(false);
+
+  useEffect(() => {
+    const fetchMostOrderedProducts = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/api/order/mostorder`,{
+          headers: {
+              'Authorization': `Bearer ${accessToken}`
+          }
+      });
+        setMostOrderedProducts(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching most ordered products:", error);
+      }
+    };
+
+    fetchMostOrderedProducts();
+  }, []);
 
   const toggleProducts = () => {
     setShowProducts(!showProducts);
+  };
+
+    const getImageUrl = (item) => {
+    // Assuming item.images is an array of objects with 'url' property
+    const images = JSON.parse(item);
+    return images[0].url;
   };
 
   return (
@@ -117,42 +51,31 @@ export default function PopularProducts() {
             <thead>
               <tr>
                 <th className="text-left pb-2">Product</th>
-                <th className="text-left pb-2">Earnings</th>
+                <th className="text-left pb-2">Order</th>
               </tr>
             </thead>
             <tbody>
-              {popularProducts.map((product) => (
+              {mostOrderedProducts.map((product) => (
                 <tr key={product.id} className="border-b">
                   <td className="flex items-center py-2">
                     <img
-                      src={product.image}
-                      alt={product.name}
+                      src={`${getImageUrl(product.product.images)}`} // Adjust image URL as per your backend response structure
+                      alt={product.title}
                       className="w-18 h-12 mr-3 rounded-md"
                     />
                     <div>
-                      <div className="font-medium">{product.name}</div>
+                      <div className="font-medium">{product.product.title}</div>
                       <div className="text-sm text-gray-500">
                         {product.type}
                       </div>
                     </div>
                   </td>
-                  <td className="py-2">{product.earnings}</td>
+                  <td className="py-2">{product.totalSold}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="flex justify-center items-center">
-          <div
-            className="flex justify-center items-center w-52 mt-4 text-white rounded-md p-2 font-semibold cursor-pointer bg-blue-600"
-            onClick={toggleProducts}
-          >
-            {showProducts ? "Hide Products" : "All Products"}
-          </div>
-        </div>
-      </div>
-      <div className="items-center justify-center flex p-4 font-semibold mt-8 min-h-52 rounded-md shadow-md border border-gray-200">
-        messages
       </div>
     </div>
   );

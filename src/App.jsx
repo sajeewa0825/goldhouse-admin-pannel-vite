@@ -5,8 +5,10 @@ import { Outlet } from "react-router-dom";
 import { useState } from "react";
 import { FaToggleOn } from "react-icons/fa";
 import { FaToggleOff } from "react-icons/fa6";
+import useAuth from './auth/useAuth';
 
 function App() {
+  useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {

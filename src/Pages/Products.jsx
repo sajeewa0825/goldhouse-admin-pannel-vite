@@ -56,9 +56,9 @@ const Products = () => {
           <button onClick={() => setCurrentView("Update Product")}>
             <h2 className="font-bold">Update Product</h2>
           </button>
-          <button onClick={() => setCurrentView("Product List")}>
+          {/* <button onClick={() => setCurrentView("Product List")}>
             <h2 className="font-bold">Product List</h2>
-          </button>
+          </button> */}
           <button onClick={() => setCurrentView("Delete Product")}>
             <h2 className="font-bold">Delete Product</h2>
           </button>

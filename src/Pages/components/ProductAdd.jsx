@@ -2,6 +2,13 @@ import React, { useState, useCallback } from "react";
 import CustomDropdown from "./CustomDropdown";
 import Cropper from "react-easy-crop";
 import { AiFillCloseCircle } from "react-icons/ai";
+import Box from "@mui/material/Box";
+import FormLabel from "@mui/material/FormLabel";
+import FormControl from "@mui/material/FormControl";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Checkbox from "@mui/material/Checkbox";
 
 const ProductAdd = ({ onSubmit }) => {
   const [product, setProduct] = useState({
@@ -12,13 +19,12 @@ const ProductAdd = ({ onSubmit }) => {
     stock: "",
     metal: "",
     weight: "",
-    length: "",
+    length: [],
     width: "",
-    ringSize: "",
-    color: "",
+    ring_size: "",
+    color: [],
     stone: "",
     gender: "",
-    review: "",
     style: "",
     images: [null, null, null, null], // Initialize with placeholders for 4 image slots
   });
@@ -47,6 +53,43 @@ const ProductAdd = ({ onSubmit }) => {
     }
   };
 
+  const handleCheckboxChange = (e) => {
+    const { name, checked, value } = e.target;
+
+    const updatedProduct = { ...product }; // Create a copy of product
+    if (
+      name === "gold" ||
+      name === "silver" ||
+      name === "rose gold" ||
+      name === "white gold"
+    ) {
+      //console.log(name);
+      if (checked) {
+        updatedProduct.color.push(name);
+      } else {
+        for (let i = updatedProduct.color.length - 1; i >= 0; i--) {
+          if (updatedProduct.color[i] === name) {
+            updatedProduct.color.splice(i, 1);
+          }
+        }
+      }
+    } else {
+      //console.log(name);
+      if (checked) {
+        updatedProduct.length.push(name);
+      } else {
+        for (let i = updatedProduct.length.length - 1; i >= 0; i--) {
+          if (updatedProduct.length[i] === name) {
+            updatedProduct.length.splice(i, 1);
+          }
+        }
+      }
+    }
+
+    setProduct(updatedProduct);
+    console.log(product); // Update state with the modified product object
+  };
+
   const handleImageRemove = (e, index) => {
     e.stopPropagation();
     e.preventDefault();
@@ -55,27 +98,77 @@ const ProductAdd = ({ onSubmit }) => {
     setProduct({ ...product, images: updatedImages });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(product);
-    setProduct({
-      title: "",
-      category: "",
-      price: "",
-      description: "",
-      stock: "",
-      metal: "",
-      weight: "",
-      length: "",
-      width: "",
-      ringSize: "",
-      color: "",
-      stone: "",
-      gender: "",
-      review: "",
-      style: "",
-      images: [null, null, null, null],
+
+    const formData = new FormData();
+    Object.keys(product).forEach((key) => {
+      if (key !== "images" && key !== "length" && key !== "color") {
+        formData.append(key, product[key]);
+      }
     });
+    for (let i = 0; i < product.images.length; i++) {
+      if (product.images[i]) {
+        console.log("image", product.images);
+        const response = await fetch(product.images[i]);
+        console.log("response", response);
+        const blob = await response.blob();
+        formData.append("images", blob, `image-${i}.jpeg`);
+      }
+    }
+
+    for (let i = 0; i < product.length?.length; i++) {
+      // Check if length is defined
+      if (product.length[i]) {
+        console.log("length", product.length[i]);
+        formData.append("length", product.length[i]);
+      }
+    }
+
+    for (let i = 0; i < product.color?.length; i++) {
+      // Check if color is defined
+      if (product.color[i]) {
+        console.log("color", product.color[i]);
+        formData.append("color", product.color[i]);
+      }
+    }
+
+    console.log("form  data ", formData);
+
+    try {
+      const backendUrl = import.meta.env.VITE_BACK_END_URL;
+      const response = await fetch(`${backendUrl}/api/product/add`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      });
+      if (response.ok) {
+        console.log("Product added successfully");
+        setProduct({
+          title: "",
+          category: "",
+          price: "",
+          description: "",
+          stock: "",
+          metal: "",
+          weight: "",
+          length: [],
+          width: "",
+          ring_size: "",
+          color: [],
+          stone: "",
+          gender: "",
+          style: "",
+          images: [null, null, null, null],
+        });
+      } else {
+        console.error("Failed to add product");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
@@ -166,6 +259,7 @@ const ProductAdd = ({ onSubmit }) => {
               onChange={handleChange}
               placeholder="Product Name"
               className="p-3 border-none rounded-lg bg-gray-200"
+              required
             />
             <input
               type="number"
@@ -174,14 +268,7 @@ const ProductAdd = ({ onSubmit }) => {
               onChange={handleChange}
               placeholder="Price"
               className="p-3 border-none rounded-lg bg-gray-200"
-            />
-            <input
-              type="number"
-              name="review"
-              value={product.review}
-              onChange={handleChange}
-              placeholder="Review"
-              className="p-3 border-none rounded-lg bg-gray-200"
+              required
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-1">
@@ -191,6 +278,7 @@ const ProductAdd = ({ onSubmit }) => {
               onChange={handleChange}
               placeholder="Product Description"
               className="p-3 border-none rounded-lg bg-gray-200"
+              required
             />
           </div>
         </div>
@@ -202,18 +290,24 @@ const ProductAdd = ({ onSubmit }) => {
             onChange={handleChange}
             placeholder="Stock"
             className="p-3 border-none rounded-lg bg-gray-200"
+            required
           />
           <CustomDropdown
             label="Category"
             options={[
-              { label: "Tops", value: "tops" },
-              { label: "Bottoms", value: "bottoms" },
-              { label: "Dresses", value: "dresses" },
-              { label: "Accessories", value: "accessories" },
+              { label: "rings", value: "rings" },
+              { label: "chains", value: "chains" },
+              { label: "pendants", value: "pendants" },
+              { label: "earrings", value: "earrings" },
+              { label: "bracelets", value: "bracelets" },
+              { label: "anklets", value: "anklets" },
+              { label: "bundles", value: "bundles" },
+              { label: "watches", value: "watches" },
             ]}
             name="category"
             value={product.category}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Weight"
@@ -227,8 +321,9 @@ const ProductAdd = ({ onSubmit }) => {
             name="weight"
             value={product.weight}
             onChange={handleChange}
+            required
           />
-          <CustomDropdown
+          {/* <CustomDropdown
             label="Length"
             options={[
               { label: "100cm", value: "100cm" },
@@ -240,7 +335,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="length"
             value={product.length}
             onChange={handleChange}
-          />
+          /> */}
           <CustomDropdown
             label="Width"
             options={[
@@ -253,6 +348,7 @@ const ProductAdd = ({ onSubmit }) => {
             name="width"
             value={product.width}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Ring Size"
@@ -263,22 +359,21 @@ const ProductAdd = ({ onSubmit }) => {
               { label: "8", value: "8" },
               { label: "9", value: "9" },
             ]}
-            name="ringSize"
-            value={product.ringSize}
+            name="ring_size"
+            value={product.ring_size}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Stone"
             options={[
-              { label: "Diamond", value: "diamond" },
-              { label: "Ruby", value: "ruby" },
-              { label: "Sapphire", value: "sapphire" },
-              { label: "Emerald", value: "emerald" },
-              { label: "Topaz", value: "topaz" },
+              { label: "natural-diamonds", value: "natural-diamonds" },
+              { label: "american-diamonds", value: "american-diamonds" },
             ]}
             name="stone"
             value={product.stone}
             onChange={handleChange}
+            required
           />
 
           <CustomDropdown
@@ -293,54 +388,128 @@ const ProductAdd = ({ onSubmit }) => {
             name="metal"
             value={product.metal}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Style"
             options={[
-              { label: "Modern", value: "modern" },
-              { label: "Vintage", value: "vintage" },
-              { label: "Classic", value: "classic" },
-              { label: "Retro", value: "retro" },
-              { label: "Bohemian", value: "bohemian" },
+              { label: "Cuban", value: "Cuban" },
+              { label: "Tennis", value: "Tennis" },
+              { label: "Figaro", value: "Figaro" },
+              { label: "Rope", value: "Rope" },
+              { label: "Palm", value: "Palm" },
+              { label: "Our Exclusive", value: "Our Exclusive" },
             ]}
             name="style"
             value={product.style}
             onChange={handleChange}
+            required
           />
           <CustomDropdown
             label="Gender"
             options={[
-              { label: "Male", value: "M" },
-              { label: "Female", value: "F" },
+              { label: "Male", value: "men" },
+              { label: "Female", value: "women" },
             ]}
             name="gender"
             value={product.gender}
             onChange={handleChange}
+            required
           />
-          <CustomDropdown
-            label="Size"
-            options={[
-              { label: "Small", value: "S" },
-              { label: "Medium", value: "M" },
-              { label: "Large", value: "L" },
-              { label: "Extra Large", value: "XL" },
-              { label: "XXL", value: "XXL" },
-            ]}
-            name="size"
-            value={product.size}
-            onChange={handleChange}
-          />
-          <CustomDropdown
-            label="Color"
-            options={[
-              { label: "Red", value: "red" },
-              { label: "Green", value: "green" },
-              { label: "Blue", value: "blue" },
-            ]}
-            name="color"
-            value={product.color}
-            onChange={handleChange}
-          />
+        </div>
+        <div className="grid grid-cols-3 font-bold gap-4 my-4">
+          <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+            <FormLabel component="legend">Assign Color</FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={product.color.includes("gold")}
+                    onChange={handleCheckboxChange}
+                    name="gold"
+                  />
+                }
+                label="gold"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={product.color.includes("silver")}
+                    onChange={handleCheckboxChange}
+                    name="silver"
+                  />
+                }
+                label="silver"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={product.color.includes("rose gold")}
+                    onChange={handleCheckboxChange}
+                    name="rose gold"
+                  />
+                }
+                label="rose gold"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={product.color.includes("white gold")}
+                    onChange={handleCheckboxChange}
+                    name="white gold"
+                  />
+                }
+                label="white gold"
+              />
+            </FormGroup>
+            <FormHelperText>Be careful</FormHelperText>
+          </FormControl>
+          <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+            <FormLabel component="legend">Assign Length</FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={product.length.includes("100cm")}
+                    onChange={handleCheckboxChange}
+                    name="100cm"
+                  />
+                }
+                label="100cm"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={product.length.includes("200cm")}
+                    onChange={handleCheckboxChange}
+                    name="200cm"
+                  />
+                }
+                label="200cm"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={product.length.includes("300cm")}
+                    onChange={handleCheckboxChange}
+                    name="300cm"
+                  />
+                }
+                label="300cm"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={product.length.includes("400cm")}
+                    onChange={handleCheckboxChange}
+                    name="400cm"
+                  />
+                }
+                label="400cm"
+              />
+            </FormGroup>
+            <FormHelperText>Be careful</FormHelperText>
+          </FormControl>
         </div>
         <div className="grid grid-cols-8 gap-5 mt-4">
           <div className="col-span-6 bg-gray-200 p-2 h-full">
